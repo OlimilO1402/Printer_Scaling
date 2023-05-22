@@ -17,7 +17,9 @@ Private Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
 Private Const LOGPIXELSX As Long = 88
 Private Const LOGPIXELSY As Long = 90
-
+Public Const ppi  As Long = 72     ' Points per inch
+Public Const tpi  As Long = 1440   ' Twips per inch, a twip is a 1/1440-th of an inch
+Public Const mmpi As Single = 25.4 ' Millimeter per inch
 Public PrinterDpi_VB  As Long
 Public PrinterDpi_API As Long
 Public ScreenDpi_VB   As Long
@@ -60,16 +62,16 @@ Public Function Millimeter_Scale(ByVal sm As ScaleModeConstants, ByVal Value As 
     'e.g. Printer.TwipsPerPixelX = 2.4  ' at 600 dpi
     Select Case sm
     'Case ScaleModeConstants.vbUser:        Millimeter_Scale = Value
-    Case ScaleModeConstants.vbTwips:       Millimeter_Scale = Value * 1440 / 25.4
-    Case ScaleModeConstants.vbPoints:      Millimeter_Scale = Value * 72 / 25.4
-    Case ScaleModeConstants.vbPixels:      Millimeter_Scale = Value * 1440 / Printer.TwipsPerPixelX / 25.4
-                                                       'a twip is a 1/1440 of an inch
+    Case ScaleModeConstants.vbTwips:       Millimeter_Scale = Value * tpi / mmpi
+    Case ScaleModeConstants.vbPoints:      Millimeter_Scale = Value * ppi / mmpi
+    Case ScaleModeConstants.vbPixels:      Millimeter_Scale = Value * tpi / Printer.TwipsPerPixelX / mmpi
+                                                      
 
     Case ScaleModeConstants.vbCharacters:  Millimeter_Scale = Value / 10 '???
     
-    Case ScaleModeConstants.vbInches:      Millimeter_Scale = Value / 25.4
+    Case ScaleModeConstants.vbInches:      Millimeter_Scale = Value / mmpi
     Case ScaleModeConstants.vbMillimeters: Millimeter_Scale = Value
-    Case ScaleModeConstants.vbCentimeters: Millimeter_Scale = Value / 10
+    Case ScaleModeConstants.vbCentimeters: Millimeter_Scale = Value / 10 ' mm per cm
     'Case ScaleModeConstants.vbHimetric:   'ungültiger Eigenschaftswert für Printer
     'Case ScaleModeConstants.vbContainerPosition
     'Case ScaleModeConstants.vbContainerSize
@@ -108,28 +110,4 @@ End Sub
 '    Millimeter_ToTwips = mm * TPPX * dpi / mmpi 'dpi / ppi * mmpi
 'End Function
 
-
-
-
-'Hi Wolfgang,
-'
-'[q]so einfach ist das leider nicht.[/q]
-'ich versteh ehrlichgesagt Deine Probleme nicht.
-'
-'[q]Bei 100% ist ein Pixel ein Pixel. [/q]
-'Japp
-'
-'[q]Alles was jenseits von diesen 100% ist, wirft Fragen auf[/q]
-'Nein! Definition:
-'1 Pixel ist die kleinste Einheit eines Bildes bzw des auf dem Monitor dargestellten Bildes.
-'Hat z.B. Dein Monitor eine Auflösung von Full-HD also 1920*1080 Pixel
-'Dann ist ein Pixel der 1920-ste Teil der Breite des Bildes auf dem Bildschirms.
-'Bzw der 1080-ste Teil der Höhe des Bildes auf dem Bildschirm.
-'Bei heutigen Flachbildschirmen, ist es soviel ich weiß nicht mehr möglich das Bild zu quetschen oder
-'zu stauchen, damit ist ein Pixel immer genau so breit wie hoch.
-'Wenn man z.B. einen Screenshot des gesamten Bildschirms macht, das Bild in ein Bildbearbeitungs-
-'programm kopiert wie z.B. MS-Paint und dann reinzoomst, dann kommt man irgendwann auf die kleinste
-'Einheit auf einen Pixel, kleiner wirds dann einfach nimmer und das wird unter einem Pixel verstanden.
-'
-'Dadurch dass die Pixeldichte Monitore immer
 
