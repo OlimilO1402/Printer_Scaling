@@ -45,15 +45,16 @@ Public Function Screen_ResolutionDpi() As Long
     Screen_ResolutionDpi = dpiX
 End Function
 
-Public Sub SelectPrinter(ByVal PrinterName As String)
+Public Function SelectPrinter(ByVal PrinterName As String) As Printer
     Dim i As Long
     For i = 0 To Printers.Count - 1
         If UCase(Printers(i).DeviceName) = UCase(PrinterName) Then 'e.g.: "Microsoft Print to PDF"
-            Set Printer = Printers(i)
+            Set SelectPrinter = Printers(i)
+            'Set Printer = SelectPrinter 'Printers(i)
             Exit For
         End If
     Next
-End Sub
+End Function
 
 Public Function Millimeter_Scale(ByVal sm As ScaleModeConstants, ByVal Value As Double) As Double
     'Value in Millimeters, the output is according to the scalemodeconstant
