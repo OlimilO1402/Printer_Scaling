@@ -13,7 +13,7 @@ Option Explicit
 '    vbContainerPosition =  9
 '    vbContainerSize     = 10
 'End Enum
-Private Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
+Private Declare Function GetDC Lib "user32" (ByVal hwnd As Long) As Long
 Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
 Private Const LOGPIXELSX As Long = 88
 Private Const LOGPIXELSY As Long = 90
@@ -79,26 +79,42 @@ Public Function Millimeter_Scale(ByVal sm As ScaleModeConstants, ByVal Value As 
     End Select
 End Function
 
-Public Sub PaintPictureW(aPic As StdPicture, ByVal X As Single, ByVal Y As Single, ByVal Width As Single)
+Public Sub PaintPictureW(aPic As StdPicture, ByVal X As Single, ByVal y As Single, ByVal Width As Single)
     'Prints the picture to the X-Y-position with the width of Width, and scales the height to ratio 1
     Dim W As Single: W = aPic.Width
     Dim H As Single: H = aPic.Height
-    Printer.PaintPicture aPic, X, Y, Width, Width * H / W
+    Printer.PaintPicture aPic, X, y, Width, Width * H / W
 End Sub
 
-Public Sub PaintPictureH(aPic As StdPicture, ByVal X As Single, ByVal Y As Single, ByVal Height As Single)
+Public Sub PaintPictureH(aPic As StdPicture, ByVal X As Single, ByVal y As Single, ByVal Height As Single)
     'Prints the picture to the X-Y-position with the height of Height, and scales the width to ratio 1
     Dim W As Single: W = aPic.Width
     Dim H As Single: H = aPic.Height
-    Printer.PaintPicture aPic, X, Y, Height * W / H, Height
+    Printer.PaintPicture aPic, X, y, Height * W / H, Height
 End Sub
 
-Public Sub PaintPictureFit(aPic As StdPicture, ByVal X As Single, ByVal Y As Single, ByVal Width As Single, ByVal OrHeight As Single)
-    If Width < OrHeight Then
-        PaintPictureH aPic, X, Y, Width 'OrHeight
-    Else
-        PaintPictureW aPic, X, Y, OrHeight 'Width
+Public Sub PaintPictureFit(aPic As StdPicture, ByVal X As Single, ByVal y As Single, ByVal Width As Single, ByVal OrHeight As Single)
+    
+    Debug.Print "W: " & Width & "; H: " & OrHeight
+    Debug.Print IIf(Printer.Orientation = PrinterObjectConstants.vbPRORPortrait, "Portrait", "Landscape")
+    
+'    If Width < OrHeight Then
+'        Width = IIf(Printer.Orientation = PrinterObjectConstants.vbPRORPortrait, Width, OrHeight)
+'    Else
+'        Width = IIf(Printer.Orientation = PrinterObjectConstants.vbPRORLandscape, Width, OrHeight) * 210 / 297
+'    End If
+    If Printer.Orientation = PrinterObjectConstants.vbPRORPortrait Then
+        If OrHeight < Width Then
+            Width = OrHeight
+        End If
+    ElseIf Printer.Orientation = PrinterObjectConstants.vbPRORLandscape Then 'what else
+        If Width < OrHeight Then
+        'If OrHeight < Width Then
+            Width = OrHeight * 210 / 297 '/ 210
+        End If
     End If
+    Debug.Print "W: " & Width & "; H: " & OrHeight
+    PaintPictureW aPic, X, y, Width
 End Sub
 
 
